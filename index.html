@@ -17,14 +17,14 @@
 <style>
 :root{
   --bg:#05080d; --panel:#0b1118; --card:#0f1620; --card2:#0a0f15; --line:#1b2532; --line2:#2a3647; --line3:#36465b; --text:#dfe6ef; --soft:#b9c4d2; --soft2:#c9d2de; --mute:#7f8b9c;
-  --up:#1fcf8f; --down:#f0605d; --gold:#f5c542; --blue:#4c9aff; --purple:#b388ff; --orange:#ff9f43; --aqua:#22d3ee;
+  --up:#1fcf8f; --down:#f0605d; --gold:#f5c542; --blue:#4c9aff; --purple:#b388ff; --orange:#ff9f43; --aqua:#22d3ee; --pink:#ff6fae;
   --chart:#020407; --hdr:rgba(5,8,13,.92); --veil:rgba(5,8,13,.75); --on-gold:#1b1505; --on-up:#03140d;
   --mono:'JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;
   --sans:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
 }
 [data-theme="light"]{
   --bg:#f3f5f9; --panel:#eef2f7; --card:#ffffff; --card2:#f7f9fc; --line:#dde3ec; --line2:#c9d2de; --line3:#b7c2d1; --text:#131a26; --soft:#3d4757; --soft2:#2c3646; --mute:#5d6879;
-  --up:#087f5b; --down:#c62f2c; --gold:#946200; --blue:#1a66c9; --purple:#7445cc; --orange:#b45000; --aqua:#00838f;
+  --up:#087f5b; --down:#c62f2c; --gold:#946200; --blue:#1a66c9; --purple:#7445cc; --orange:#b45000; --aqua:#00838f; --pink:#c2185b;
   --chart:#ffffff; --hdr:rgba(243,245,249,.92); --veil:rgba(255,255,255,.85); --on-gold:#ffffff; --on-up:#ffffff;
 }
 *{box-sizing:border-box}
@@ -926,18 +926,382 @@ les({id:'wetter',cat:'reise',title:'Jetstream & Turbulenzen',sub:'Rückenwind in
  bedeutung:'Airlines planen ihre Routen jeden Tag neu nach dem Wind. Mit Rückenwind spart ein Flug viel Zeit und Kerosin – Flüge nach Europa sind deshalb oft deutlich kürzer.',
  tipp:'Turbulenzen sind unangenehm, aber Flugzeuge halten sie problemlos aus. Gefährlich sind sie vor allem für Menschen, die nicht angeschnallt sind.'}});
 
+/* ============ PAKET 2 ============ */
+CATS.spezial='Besondere Flugzeuge';
+function heli(g,x,y,S,o={}){const t=o.t||0;g.save();g.translate(x,y);g.rotate(-(o.pitch||0));g.scale(S,S);const lw=1.5/S;
+ poly(g,[[-.1,-.04],[-.62,-.06],[-.62,-.03],[-.1,.05]],C.body,C.bodyLine,lw);
+ poly(g,[[-.58,-.05],[-.66,-.2],[-.71,-.2],[-.65,-.04]],C.body,C.bodyLine,lw);
+ const tr=Math.sin(t*.05);line(g,-.69,-.13-.09*tr,-.69,-.13+.09*tr,o.hlTail?C.gold:C.metal,lw*2.4);
+ g.beginPath();g.ellipse(0,0,.22,.13,0,0,TAU);g.fillStyle=C.body;g.fill();g.strokeStyle=C.bodyLine;g.lineWidth=lw;g.stroke();
+ g.beginPath();g.ellipse(.11,-.02,.1,.08,0,-1.3,.9);g.fillStyle=hexA(C.win,.55);g.fill();
+ line(g,-.15,.12,-.13,.18,C.bodyLine,lw*1.5);line(g,.1,.12,.12,.18,C.bodyLine,lw*1.5);line(g,-.24,.18,.26,.18,C.bodyLine,lw*2);
+ line(g,0,-.13,0,-.19,C.metal,lw*3);g.save();g.translate(0,-.19);g.rotate(-(o.tilt||0));const b=Math.cos(t*.04);
+ g.strokeStyle=hexA(C.metal,.3);g.lineWidth=lw;g.beginPath();g.ellipse(0,0,.56,.03,0,0,TAU);g.stroke();
+ g.strokeStyle=o.hl?C.gold:C.metal2;g.lineWidth=lw*3;g.beginPath();g.moveTo(-.56*b,0);g.lineTo(.56*b,0);g.stroke();g.restore();
+ g.restore();}
+function glider(g,x,y,S,ang=0){g.save();g.translate(x,y);g.rotate(ang);g.scale(S,S);const lw=1.5/S;
+ g.beginPath();g.moveTo(.5,0);g.quadraticCurveTo(.45,-.07,.25,-.06);g.lineTo(-.45,-.015);g.lineTo(-.45,.01);g.lineTo(.25,.05);g.quadraticCurveTo(.45,.06,.5,0);g.closePath();g.fillStyle=C.body;g.fill();g.strokeStyle=C.bodyLine;g.lineWidth=lw;g.stroke();
+ poly(g,[[.35,-.05],[.25,-.07],[.18,-.05]],hexA(C.win,.6));poly(g,[[-.38,-.015],[-.47,-.16],[-.5,-.16],[-.46,-.01]],C.body,C.bodyLine,lw);line(g,-.55,-.16,-.42,-.16,C.bodyLine,lw*2);
+ g.beginPath();g.ellipse(.12,-.02,.12,.012,0,0,TAU);g.fillStyle=C.bodyLine;g.fill();g.restore();}
+function spiral(g,x,y,r,t,col,a=1,dir=1){if(a<=0)return;g.save();g.globalAlpha*=a;g.translate(x,y);g.rotate(t*.008*dir);g.strokeStyle=col;g.lineWidth=1.6;g.beginPath();for(let k=0;k<40;k++){const an=k*.4,rr=r*k/40;g.lineTo(Math.cos(an)*rr,Math.sin(an)*rr);}g.stroke();g.restore();}
+function bolt(g,x1,y1,x2,y2,col,a=1,seed=1){if(a<=0)return;g.save();g.globalAlpha*=a;g.strokeStyle=col;g.lineWidth=2.4;g.beginPath();g.moveTo(x1,y1);const n=7;for(let i=1;i<n;i++){const f=i/n;g.lineTo(lerp(x1,x2,f)+Math.sin(i*12.9+seed)*10,lerp(y1,y2,f));}g.lineTo(x2,y2);g.stroke();g.restore();}
+function bird(g,x,y,s,col,t){const f=Math.sin(t*.02+x)*.5;g.strokeStyle=col;g.lineWidth=1.8;g.beginPath();g.moveTo(x-s,y-s*f);g.quadraticCurveTo(x-s*.4,y-s*.6,x,y);g.quadraticCurveTo(x+s*.4,y-s*.6,x+s,y-s*f);g.stroke();}
+
+/* ---------- Aerodynamik ---------- */
+les({id:'wirbel',cat:'aero',title:'Randwirbel & Winglets',sub:'Unsichtbare Luftwirbel hinter jedem Flugzeug',
+ steps:S([[4600,'Unter dem Flügel ist Überdruck, darüber Unterdruck. An der Flügelspitze versucht die Luft, von unten nach oben auszugleichen.'],
+ [4800,'So entsteht an jeder Flügelspitze ein kräftiger Luftwirbel – der Randwirbel. Er kostet Energie und erzeugt zusätzlichen Widerstand.'],
+ [5200,'Die beiden Wirbel ziehen kilometerweit hinter dem Flugzeug her und sinken langsam ab: die Wirbelschleppe.'],
+ [5600,'Für kleinere Flugzeuge ist sie gefährlich. Deshalb gilt Abstand: Hinter einem A380 muss ein kleines Flugzeug beim Landen bis zu 8 Seemeilen (ca. 15 km) Abstand halten.'],
+ [5000,'Winglets an den Flügelspitzen machen den Wirbel schwächer. Das spart je nach Flugzeug etwa 3–5 % Kerosin.']]),
+ draw(g,st){const{s,p,t}=st;
+  if(s<=1||s===4){const cx=200,cy=135;planeFront(g,cx,cy,300,0,{});
+   if(s===4){[-1,1].forEach(sg=>{line(g,cx+sg*150,cy-12,cx+sg*156,cy-40,C.gold,4);});pill(g,cx,30,'WINGLETS',C.gold,1);}
+   const a0=ap(st,0);pill(g,cx,72,'UNTERDRUCK',C.blue,a0*(s===0?1:.5));pill(g,cx,200,'ÜBERDRUCK',C.down,a0*(s===0?1:.5));
+   [-1,1].forEach(sg=>{const tx=cx+sg*152,ty=cy-10;if(s===0){for(let i=0;i<3;i++){const f=(t*.0015+i/3)%1,an=Math.PI/2-f*Math.PI;circ(g,tx+sg*Math.cos(an)*18,ty+Math.sin(an)*18,2.4,C.aqua);}arrow(g,tx-sg*30,ty+30,tx+sg*8,ty+18,C.aqua,2,1);}
+    else spiral(g,tx+sg*4,ty,s===4?11:24,t,C.aqua,1,-sg);});
+   if(s===1)pill(g,cx,232,'RANDWIRBEL',C.aqua,1);if(s===4)pill(g,cx,232,'SCHWÄCHERER WIRBEL = WENIGER VERBRAUCH',C.up,1);}
+  else{const px=s===2?300:330,py=125;planeTop(g,px,py,s===2?120:90,0,{});const span=(s===2?120:90)*.5;
+   [-1,1].forEach(sg=>{g.save();g.strokeStyle=hexA(C.aqua,.7);g.lineWidth=1.6;g.beginPath();for(let x=px-span*.4;x>0;x-=3){const d=px-x;g.lineTo(x,py+sg*(span-d*.03)+Math.sin(d*.12-t*.01)*Math.min(8,d*.05));}g.stroke();g.restore();});
+   pill(g,120,30,'WIRBELSCHLEPPE',C.aqua,1);
+   if(s===3){const lx=lerp(60,110,(Math.sin(t*.002)+1)/2);planeTop(g,lx,py,30,0,{});arrow(g,lx+20,py+60,px-40,py+60,C.gold,1.6,1,true);pill(g,(lx+px)/2,py+80,'≈ 15 km ABSTAND',C.gold,1);}}}
+ ,box:{was:'Randwirbel entstehen an den Flügelspitzen, weil die Luft vom Überdruck unter dem Flügel zum Unterdruck darüber strömt. Zusammen bilden sie die Wirbelschleppe.',h2:'So erkennst du sie',
+ erkennen:['Bei feuchter Luft als weiße Spiralen an den Flügelspitzen sichtbar','Wirbelschleppe sinkt hinter dem Flugzeug ab','Je schwerer und langsamer, desto stärker die Wirbel','Winglets und Sharklets machen sie schwächer'],
+ bedeutung:'Wegen der Wirbelschleppe gibt es feste Mindestabstände zwischen startenden und landenden Flugzeugen. Sie bestimmen mit, wie viele Flugzeuge pro Stunde eine Bahn nutzen können.',
+ tipp:'Vögel nutzen die Randwirbel: Im V-Flug fliegt jeder Vogel im Aufwind des Wirbels seines Vordermanns und spart so Kraft.'}});
+
+les({id:'bodeneffekt',cat:'aero',title:'Der Bodeneffekt',sub:'Warum Flugzeuge kurz vor dem Aufsetzen „schweben“',
+ steps:S([[4600,'Im normalen Flug lenkt der Flügel die Luft nach unten ab. Dieser Abwind kann sich frei ausbreiten.'],
+ [5200,'Kommt das Flugzeug nahe an den Boden – niedriger als etwa eine Spannweite –, kann die Luft nicht mehr frei nach unten. Sie staut sich wie ein Luftkissen.'],
+ [5000,'Die Randwirbel werden kleiner, der Widerstand sinkt und der Auftrieb steigt etwas. Das Flugzeug „schwebt“ und will nicht recht aufsetzen.'],
+ [4800,'Piloten kennen das: Beim Abfangen kurz vor der Landung muss man den Bodeneffekt einplanen, sonst schwebt man weit über die Aufsetzzone hinaus.'],
+ [5000,'Es gibt sogar Fahrzeuge, die nur im Bodeneffekt fliegen: Bodeneffektfahrzeuge (Ekranoplane) gleiten wenige Meter über dem Wasser.']]),
+ draw(g,st){const{s,p,t}=st;const gy=205;ground(g,gy);
+  const h=s===0?120:s===1?lerp(120,40,ease(p)):40;const px=200,py=gy-h-18;
+  if(s===4){g.fillStyle=hexA(C.blue,.25);g.fillRect(0,gy,400,50);for(let i=0;i<8;i++){const x=((i*60-t*.08)%480+480)%480-40;line(g,x,gy+12,x+20,gy+12,hexA(C.blue,.6),1.4);}}
+  planeSide(g,px,py,s===4?200:220,{gear:s===3?1:0});
+  const cush=clamp((120-h)/80);for(let i=0;i<6;i++){const x=px-60+i*24,f=(t*.0015+i/6)%1;const len=lerp(10,gy-py-20,f);
+   const yy=py+18+len;if(yy<gy-4)circ(g,x-f*20,yy,2.2,C.blue);else circ(g,x-f*20-(yy-gy)*.8,gy-4,2.2,C.gold);}
+  if(cush>.3){g.save();g.globalAlpha=cush;const gr=g.createLinearGradient(0,gy-40,0,gy);gr.addColorStop(0,hexA(C.gold,0));gr.addColorStop(1,hexA(C.gold,.35));g.fillStyle=gr;g.fillRect(px-140,gy-40,280,40);g.restore();pill(g,px,gy+20,'LUFTKISSEN',C.gold,cush);}
+  arrow(g,330,py+10,330,gy,C.mute,1.4,s<=1?1:0,true);pill(g,360,(py+gy)/2,s===0?'HOCH':'< 1 SPANNWEITE',C.mute,s<=1?1:0,'center');
+  if(s===2)pill(g,330,40,'WENIGER WIDERSTAND',C.up,1);if(s===3)pill(g,330,40,'FLUGZEUG SCHWEBT',C.gold,1);if(s===4)pill(g,200,30,'EKRANOPLAN',C.aqua,1);}
+ ,box:{was:'Der Bodeneffekt tritt auf, wenn ein Flügel sehr nah über dem Boden oder Wasser fliegt. Der Boden behindert den Abwind – es entsteht eine Art Luftkissen.',h2:'So erkennst du ihn',
+ erkennen:['Wirkt unter etwa einer Spannweite Höhe','Weniger Widerstand, etwas mehr Auftrieb','Flugzeug „schwebt“ beim Abfangen','Besonders stark bei Tiefdeckern'],
+ bedeutung:'Beim Landen sorgt der Bodeneffekt für ein weiches Aufsetzen, kann aber den Landeweg verlängern. Beim Start hebt ein Flugzeug manchmal früher ab, als es eigentlich steigen kann.',
+ tipp:'Auch Vögel wie Pelikane und Möwen nutzen den Bodeneffekt: Sie gleiten knapp über die Wasseroberfläche und sparen so Energie.'}});
+
+/* ---------- Triebwerke ---------- */
+les({id:'apu',cat:'antrieb',title:'Hilfstriebwerk & Triebwerksstart',sub:'Die kleine Turbine im Heck',
+ steps:S([[4600,'Ganz hinten im Heck sitzt ein kleines Triebwerk: die APU (Auxiliary Power Unit, Hilfstriebwerk). Daher kommt das Rauschen am Gate.'],
+ [4600,'Die APU erzeugt Strom für Licht, Bildschirme und Küche – auch wenn die Haupttriebwerke aus sind.'],
+ [4600,'Sie liefert außerdem Druckluft. Damit läuft am Boden die Klimaanlage in der Kabine.'],
+ [5400,'Triebwerksstart: Die Druckluft treibt einen Anlasser an, der die Welle des Triebwerks in Drehung versetzt.'],
+ [5600,'Bei etwa 20 % Drehzahl wird Kerosin eingespritzt und gezündet. Das Triebwerk beschleunigt von selbst bis in den Leerlauf. Dann kann die APU aus.']]),
+ draw(g,st){const{s,p,t}=st;const P=planeSide(g,190,120,340,{gear:1});const tail=P(-.49,-.03),eng=P(.12,.09),cab=P(.1,-.02);
+  circ(g,tail[0],tail[1],12,null,C.gold,2);pill(g,tail[0]+6,tail[1]-30,'APU',C.gold,1);
+  for(let i=0;i<4;i++){const f=(t*.002+i/4)%1;circ(g,tail[0]-6-f*24,tail[1]-2-f*6,2,hexA(C.exhaust,1-f));}
+  if(s===1){flow(g,[tail,[tail[0]+20,tail[1]+10],cab],t,C.gold,{gap:12,speed:.06,r:2.2});pill(g,cab[0],cab[1]-36,'STROM ⚡',C.gold,1);}
+  if(s===2){flow(g,[tail,[tail[0]+20,tail[1]+14],cab],t,C.aqua,{gap:12,speed:.06,r:2.2});pill(g,cab[0],cab[1]-36,'KLIMAANLAGE',C.aqua,1);}
+  if(s>=3){flow(g,[tail,[tail[0]+20,tail[1]+14],[eng[0]-30,eng[1]-10],eng],t,C.aqua,{gap:12,speed:.07,r:2.2,a:s===4&&p>.6?1-(p-.6)*2.5:1});
+   const n=s===3?ease(p)*20:lerp(20,60,ease(clamp((p-.15)*1.6)));dial(g,340,190,30,n/100,n>=20?C.up:C.aqua,`DREHZAHL ${Math.round(n)} %`);
+   if(s===4&&p>.15){for(let i=0;i<5;i++){const f=(t*.003+i/5)%1;circ(g,eng[0]-30-f*50,eng[1]+2,2.4,C.fire);}pill(g,eng[0]-20,eng[1]+38,'KEROSIN + ZÜNDUNG',C.fire,1);}}}
+ ,box:{was:'Die APU ist eine kleine Gasturbine im Heck. Sie versorgt das Flugzeug am Boden mit Strom und Druckluft und startet die großen Triebwerke.',h2:'So erkennst du sie',
+ erkennen:['Kleine Abgasöffnung ganz hinten am Heck','Rauschen am Gate, obwohl die Triebwerke aus sind','Liefert Strom und Druckluft','Startet die Haupttriebwerke mit Druckluft'],
+ bedeutung:'Ohne APU bräuchte das Flugzeug am Boden einen Stromwagen und Druckluft von außen. Im Notfall kann die APU auch im Flug Strom liefern.',
+ tipp:'Kurz vor dem Triebwerksstart wird die Klimaanlage oft abgeschaltet – die Druckluft wird dann komplett für den Anlasser gebraucht. Deshalb wird es kurz still in der Kabine.'}});
+
+les({id:'vogelschlag',cat:'antrieb',title:'Vogelschlag & Triebwerkstests',sub:'Was ein Triebwerk aushalten muss',
+ steps:S([[4600,'Vögel sind vor allem in Bodennähe ein Risiko – also bei Start und Landung. Flughäfen vertreiben sie deshalb mit Geräuschen, Falken oder Hunden.'],
+ [4800,'Trifft ein Vogel den Fan, wird er von den Schaufeln zerschlagen und meist durch den Nebenstrom nach hinten geblasen.'],
+ [5600,'Jedes Triebwerk muss Tests bestehen: Mit einer Druckluftkanone werden tote Vögel (bis ca. 3,6 kg) in das laufende Triebwerk geschossen. Es darf nicht brennen oder auseinanderfliegen.'],
+ [5600,'Beim „Blade-off-Test“ wird bei Vollgas absichtlich eine Fanschaufel abgesprengt. Das Gehäuse muss alle Teile auffangen.'],
+ [5400,'2009 traf eine Gänseschar beide Triebwerke eines A320 in New York. Die Piloten landeten sicher auf dem Hudson River – alle 155 Menschen überlebten.']]),
+ draw(g,st){const{s,p,t}=st;const cx=230,cy=125,R=88;
+  if(s===0){ground(g,210);g.fillStyle=C.runway;g.fillRect(0,210,400,14);planeSide(g,260,150,200,{gear:1,pitch:rad(8)});for(let i=0;i<6;i++){const x=((i*70-t*.04)%440+440)%440-20;bird(g,x,40+(i%3)*30,8,C.text,t);}pill(g,60,236,'START & LANDUNG',C.gold,1);return;}
+  if(s===4){g.fillStyle=hexA(C.blue,.25);g.fillRect(0,170,400,80);planeSide(g,200,160,260,{});for(let i=0;i<5;i++){const x=((i*40+t*.03)%200)+100;circ(g,x,174,3,hexA(C.mute,.5));}pill(g,200,30,'NEW YORK 2009 · HUDSON RIVER',C.blue,1);pill(g,200,220,'155 VON 155 ÜBERLEBT',C.up,1);return;}
+  circ(g,cx,cy,R+8,C.head,C.blockLine,3);circ(g,cx,cy,R+2,C.bg,null);
+  const rot=t*.02;for(let k=0;k<18;k++){if(s===3&&k===0&&p>.3)continue;const an=rot+k*TAU/18;g.save();g.translate(cx,cy);g.rotate(an);poly(g,[[14,-3],[R,-9],[R,3],[14,4]],C.metal2,C.metalHi,1);g.restore();}circ(g,cx,cy,16,C.metalHi,C.metal,1.6);
+  if(s===1||s===2){const f=s===1?clamp(p*1.6):clamp((p-.25)*1.6);if(s===2){box(g,10,cy-14,70,28,C.head,C.metal,6);pill(g,45,cy+30,'DRUCKLUFTKANONE',C.metal,1);}
+   const bx=lerp(s===2?80:20,cx-10,f);if(f<1)bird(g,bx,cy-30+f*20,12,C.text,t);else{for(let i=0;i<10;i++){const a=i*.63,d=(p*200)%60;circ(g,cx+Math.cos(a)*d,cy+Math.sin(a)*d,2,hexA(C.down,.7));}}
+   pill(g,330,40,s===1?'VOGEL TRIFFT FAN':'TEST: BIS 3,6 kg',C.down,1);}
+  if(s===3&&p>.3){const f=clamp((p-.3)*2.5),an=rot+.0,d=lerp(R*.6,R+4,f);g.save();g.translate(cx+Math.cos(an)*d,cy+Math.sin(an)*d);g.rotate(an+t*.02);box(g,-20,-4,40,8,C.down,null,2);g.restore();circ(g,cx,cy,R+8,null,f>.9?C.up:C.gold,4);pill(g,330,40,'BLADE-OFF-TEST',C.down,1);if(f>.9)pill(g,330,220,'GEHÄUSE HÄLT ✓',C.up,1);}}
+ ,box:{was:'Vogelschlag bedeutet, dass ein Vogel mit einem Flugzeug zusammenstößt – meist bei Start oder Landung. Triebwerke werden darauf mit harten Tests vorbereitet.',h2:'So wird getestet',
+ erkennen:['Vögel werden mit einer Druckluftkanone eingeschossen','Triebwerk darf nicht brennen oder auseinanderbrechen','Blade-off-Test: Schaufel absprengen bei Vollgas','Das Gehäuse muss alle Bruchstücke halten'],
+ bedeutung:'Ein einzelner Vogelschlag ist meist harmlos. Gefährlich wird es, wenn mehrere große Vögel beide Triebwerke treffen – das passiert sehr selten.',
+ tipp:'Viele Triebwerke haben einen weißen Spiralpunkt auf der Nabe: Er soll Vögel durch den Dreheffekt abschrecken und zeigt der Bodencrew, ob der Fan sich dreht.'}});
+
+/* ---------- Bau ---------- */
+les({id:'endmontage',cat:'bau',title:'So entsteht ein Airbus',sub:'Von Bauteilen aus ganz Europa zum fertigen Jet',
+ steps:S([[5200,'Ein Airbus A320 entsteht in ganz Europa: Rumpfteile kommen aus Hamburg und Saint-Nazaire, die Flügel aus Broughton (Wales), das Höhenleitwerk aus Getafe (Spanien).'],
+ [5000,'Die großen Teile fliegen mit dem Beluga – einem Transportflugzeug mit riesigem Laderaum – zu den Montagewerken.'],
+ [5200,'In der Endmontagelinie (z. B. in Hamburg-Finkenwerder) werden die Rumpfsektionen zusammengefügt und vernietet.'],
+ [5000,'Dann kommen Flügel, Leitwerk, Fahrwerk und Triebwerke dazu. Kilometer von Kabeln und die Kabine werden eingebaut.'],
+ [5000,'Zum Schluss: Lackierung in den Farben der Airline, Bodentests und ein Testflug. Erst dann wird das Flugzeug übergeben.']]),
+ draw(g,st){const{s,p,t}=st;
+  if(s===0){const pts=[[270,70,'HAMBURG',C.blue],[130,130,'SAINT-NAZAIRE',C.purple],[150,60,'BROUGHTON',C.gold],[110,210,'GETAFE',C.orange]],T=[210,185,'TOULOUSE',C.up];
+   pts.forEach(([x,y,n,col],i)=>{const a=clamp(p*5-i);circ(g,x,y,6,col);pill(g,x,y-16,n,col,a);});circ(g,T[0],T[1],7,T[3]);pill(g,T[0]+4,T[1]+18,'TOULOUSE',T[3],1);
+   pill(g,330,220,'ENDMONTAGE: HAMBURG · TOULOUSE',C.mute,1,'center',9.5);return;}
+  if(s===1){clouds(g,t,.05);const P=planeSide(g,200,130,280,{});g.save();g.beginPath();g.ellipse(200+40,130-30,95,30,0,Math.PI,TAU);g.fillStyle=C.body;g.fill();g.strokeStyle=C.bodyLine;g.lineWidth=1.5;g.stroke();g.restore();box(g,170,95,90,28,hexA(C.gold,.25),C.gold,6);pill(g,215,109,'RUMPFTEIL',C.gold,1);pill(g,200,226,'BELUGA',C.text,1);return;}
+  const gy=200;ground(g,gy);
+  if(s===2){const f=ease(clamp(p*1.4));[[-1,0],[0,1],[1,2]].forEach(([k,i])=>{const x=200+k*90+k*(1-f)*40;rr(g,x-45,105,90,40,k===1?20:k===-1?6:6);g.fillStyle=C.body;g.fill();g.strokeStyle=[C.blue,C.purple,C.orange][i];g.lineWidth=2;g.stroke();});
+   pill(g,200,70,'RUMPFSEKTIONEN WERDEN VERBUNDEN',C.text,1);if(f>.95)for(let k=0;k<2;k++)for(let j=0;j<5;j++)circ(g,245-90*k*1+0,110+j*7,1.6,C.gold);return;}
+  if(s===3){planeSide(g,200,140,320,{gear:1,hl:p<.5?'fluegel':'tw'});pill(g,200,40,p<.5?'FLÜGEL MONTIEREN':'TRIEBWERKE ANBAUEN',C.gold,1);return;}
+  if(s===4){const P=planeSide(g,200,140,320,{gear:1});g.save();g.globalAlpha=.4;g.fillStyle=C.blue;g.fillRect(200-160,140-25,320*clamp(p*1.5),12);g.restore();pill(g,200,40,p<.6?'LACKIERUNG':'TESTFLUG ✓',p<.6?C.blue:C.up,1);}}
+ ,box:{was:'Verkehrsflugzeuge werden aus großen Baugruppen zusammengesetzt, die in verschiedenen Werken entstehen. In der Endmontagelinie wird daraus ein fertiges Flugzeug.',h2:'So läuft es ab',
+ erkennen:['Bauteile aus mehreren Ländern','Transport mit dem Beluga-Frachtflugzeug','Endmontage: Rumpf, Flügel, Triebwerke, Kabine','Lackierung, Tests und Testflug'],
+ bedeutung:'Airbus baut weltweit mehr als 50 Flugzeuge der A320-Familie pro Monat – unter anderem in Hamburg, Toulouse, Tianjin (China) und Mobile (USA).',
+ tipp:'Das Airbus-Werk in Hamburg-Finkenwerder kann man bei Werksführungen besichtigen. Hubschrauber baut Airbus übrigens in Bayern – im Werk Donauwörth.'}});
+
+les({id:'wartung',cat:'bau',title:'Wartung & Checks',sub:'Vom Rundgang bis zur Generalüberholung',
+ steps:S([[4600,'Vor jedem Flug gehen Pilot oder Techniker einmal um das Flugzeug herum: der Walkaround. Reifen, Klappen, Triebwerke, Lecks – alles wird angeschaut.'],
+ [4800,'A-Check: etwa alle paar Hundert Flugstunden. Über Nacht werden Systeme, Öl und Verschleißteile geprüft.'],
+ [5200,'C-Check: etwa alle 2 Jahre. Das Flugzeug steht 1 bis 3 Wochen im Hangar, viele Verkleidungen werden geöffnet.'],
+ [5600,'D-Check (Generalüberholung): etwa alle 6 bis 10 Jahre. Das Flugzeug wird fast komplett zerlegt und auf Risse und Korrosion untersucht – das dauert mehrere Wochen.'],
+ [5000,'Jede Arbeit wird dokumentiert. So kann ein Flugzeug 25 bis 30 Jahre sicher fliegen.']]),
+ draw(g,st){const{s,p,t}=st;
+  if(s===0){ground(g,190);const P=planeSide(g,200,150,300,{gear:1});const a=t*.0012,px=200+Math.cos(a)*170,py=200+Math.sin(a)*12;circ(g,px,py-12,5,C.gold);line(g,px,py-7,px,py+6,C.gold,2.5);pill(g,200,30,'WALKAROUND',C.gold,1);return;}
+  const rows=[['A-CHECK','alle paar 100 h','1 Nacht',.15,C.up],['C-CHECK','ca. alle 2 Jahre','1–3 Wochen',.45,C.gold],['D-CHECK','alle 6–10 Jahre','mehrere Wochen',1,C.down]];
+  rows.forEach(([n,w,d,len,col],i)=>{const a=ap(st,i+1);if(!a)return;const y=50+i*58;pill(g,20,y,n,col,a,'left');if(!G.nolabel){g.save();g.globalAlpha=a;txt(g,110,y,w,C.text,11,'left',600);txt(g,110,y+18,'Dauer: '+d,C.mute,10.5,'left',500);g.restore();}
+   box(g,250,y-8,130,16,C.line,null,4);box(g,250,y-8,130*len*(s===i+1?ease(p):1),16,col,null,4);});
+  if(s===4)pill(g,200,226,'25–30 JAHRE IM DIENST',C.up,1);}
+ ,box:{was:'Flugzeuge werden nach einem festen Plan gewartet. Je größer der Check, desto gründlicher wird das Flugzeug untersucht.',h2:'So läuft es ab',
+ erkennen:['<b>Walkaround:</b> vor jedem Flug','<b>A-Check:</b> kurz, oft über Nacht','<b>C-Check:</b> gründlich, 1–3 Wochen','<b>D-Check:</b> fast komplette Zerlegung'],
+ bedeutung:'Strenge Wartung ist einer der Gründe, warum Fliegen so sicher ist. Fehler werden gefunden, bevor sie gefährlich werden.',
+ tipp:'Bei großen Checks wird mit Wirbelstrom, Ultraschall und Röntgen geprüft – die gleichen Verfahren wie bei der Bauteilprüfung in der Fabrik.'}});
+
+les({id:'blitz',cat:'bau',title:'Blitzschlag ins Flugzeug',sub:'Warum ein Blitz meist harmlos ist',
+ steps:S([[4600,'Jedes Verkehrsflugzeug wird im Schnitt etwa einmal pro Jahr vom Blitz getroffen – meist beim Steigen oder Sinken durch Wolken.'],
+ [5000,'Der Blitz trifft oft die Nase oder eine Flügelspitze. Der Strom fließt über die Außenhaut und verlässt das Flugzeug am Heck oder an einer anderen Spitze.'],
+ [5000,'Die Metallhülle wirkt wie ein Faradayscher Käfig: Innen bleibt es stromfrei. Die Passagiere sehen nur einen Blitz und hören einen Knall.'],
+ [5000,'CFK leitet Strom schlecht. Deshalb wird in Kohlefaser-Bauteile ein feines Kupfer- oder Metallgitter eingebettet.'],
+ [5000,'An den Hinterkanten sitzen kleine Entladestäbe (Static Wicks). Sie geben statische Ladung langsam an die Luft ab.']]),
+ draw(g,st){const{s,p,t}=st;g.fillStyle=hexA(C.mute,.08);g.fillRect(0,0,400,250);clouds(g,t,.03,1);
+  const P=planeSide(g,200,130,300,{});
+  if(s<=2){const fl=(Math.sin(t*.01)>.6)?1:.25;bolt(g,370,0,P(.5,0)[0],P(.5,0)[1],C.gold,fl,Math.floor(t/200));bolt(g,P(-.5,-.2)[0],P(-.5,-.2)[1],20,250,C.gold,s>=1?fl:0,Math.floor(t/200)+3);}
+  if(s>=1&&s<=2){const pts=[P(.5,0),P(.4,-.06),P(-.3,-.06),P(-.45,-.2)];flow(g,pts,t,C.gold,{gap:14,speed:.12,r:2.4});pill(g,200,30,'STROM ÜBER DIE HAUT',C.gold,1);}
+  if(s===2){g.save();g.globalAlpha=.6;const c=P(0,0);g.fillStyle=hexA(C.up,.15);g.beginPath();g.ellipse(c[0],c[1],140,15,0,0,TAU);g.fill();g.restore();pill(g,200,220,'INNEN: KEIN STROM ✓',C.up,1);}
+  if(s===3){const c=P(-.42,-.13);box(g,c[0]-30,c[1]-50,60,40,C.bg,C.orange,4);g.save();g.beginPath();g.rect(c[0]-30,c[1]-50,60,40);g.clip();g.strokeStyle=C.orange;g.lineWidth=1;for(let i=-60;i<60;i+=6){line(g,c[0]+i,c[1]-50,c[0]+i+40,c[1]-10,C.orange,1);line(g,c[0]+i+40,c[1]-50,c[0]+i,c[1]-10,C.orange,1);}g.restore();pill(g,c[0],c[1]-62,'KUPFERGITTER IM CFK',C.orange,1);}
+  if(s===4){[P(-.16,.075),P(-.5,-.24),P(-.5,-.04)].forEach(q=>{line(g,q[0],q[1],q[0]-12,q[1]+4,C.aqua,2);if(Math.sin(t*.02+q[0])>.7)circ(g,q[0]-14,q[1]+4,3,C.aqua);});pill(g,200,220,'ENTLADESTÄBE',C.aqua,1);}}
+ ,box:{was:'Blitzschläge gehören zum Fliegen dazu. Flugzeuge sind so gebaut, dass der Strom außen über die Hülle abfließt, ohne Schaden anzurichten.',h2:'So schützt sich das Flugzeug',
+ erkennen:['Strom fließt über die leitende Außenhaut','Faradayscher Käfig schützt das Innere','Metallgitter in CFK-Teilen','Entladestäbe an den Hinterkanten'],
+ bedeutung:'Nach einem Blitzschlag wird das Flugzeug nach der Landung auf Einschlag- und Austrittsstellen untersucht. Meist findet man nur kleine Schmorstellen.',
+ tipp:'Das gleiche Prinzip schützt dich im Auto: Auch eine Autokarosserie wirkt bei Gewitter wie ein Faradayscher Käfig – bleib einfach sitzen.'}});
+
+/* ---------- Steuerung ---------- */
+les({id:'notfall',cat:'steuer',title:'Triebwerksausfall',sub:'Fliegen mit nur einem Triebwerk',
+ steps:S([[4800,'Fällt bei einem zweistrahligen Flugzeug ein Triebwerk aus, zieht nur noch eines. Das Flugzeug will sich zur Seite des toten Triebwerks drehen.'],
+ [4800,'Der Pilot hält mit dem Seitenruder dagegen. So fliegt das Flugzeug wieder geradeaus.'],
+ [5200,'Mit einem Triebwerk kann ein Verkehrsflugzeug sicher weiterfliegen. Meist sinkt es auf eine niedrigere Höhe, wo das eine Triebwerk genug Leistung hat.'],
+ [5600,'ETOPS-Regeln legen fest, wie weit ein Zweistrahler über Ozeanen von einem Ausweichflughafen entfernt sein darf – z. B. höchstens 180 Minuten mit einem Triebwerk.'],
+ [5000,'Die Crew arbeitet Checklisten ab, setzt den Notfallcode 7700 und landet am nächsten geeigneten Flughafen.']]),
+ draw(g,st){const{s,p,t}=st;
+  if(s<=2){const yaw=s===0?ease(p)*.35:s===1?lerp(.35,0,ease(p)):0;planeTop(g,200,125,240,-Math.PI/2+yaw,{rud:s===1||s===2?.5:null});
+   const L=[200-55*Math.cos(yaw)+0,125];const c=Math.cos(-Math.PI/2+yaw),sn=Math.sin(-Math.PI/2+yaw);const pt=(u,v)=>[200+240*(u*c-v*sn),125+240*(u*sn+v*c)];
+   const le=pt(.06,-.17),re=pt(.06,.17);circ(g,le[0],le[1],10,null,C.down,2.4);pill(g,le[0]-34,le[1],'AUS',C.down,1);circ(g,re[0],re[1],10,null,C.up,2.4);
+   for(let i=0;i<4;i++){const f=(t*.002+i/4)%1,q=pt(.0-f*.3,.17);circ(g,q[0],q[1],2.2,C.orange);}
+   if(s===0)pill(g,320,30,'DREHT ZUR TOTEN SEITE',C.down,1);if(s===1)pill(g,320,30,'SEITENRUDER HÄLT DAGEGEN',C.gold,1);if(s===2)pill(g,320,30,'SICHER WEITER ✓',C.up,1);}
+  else if(s===3){g.fillStyle=hexA(C.blue,.12);g.fillRect(0,0,400,250);const A=[[40,180],[360,70]];A.forEach(([x,y])=>{circ(g,x,y,150,hexA(C.up,.08),hexA(C.up,.5),1.4);circ(g,x,y,6,C.up);});
+   g.save();g.strokeStyle=C.aqua;g.setLineDash([5,4]);g.lineWidth=1.6;g.beginPath();g.moveTo(40,180);g.quadraticCurveTo(200,60,360,70);g.stroke();g.restore();pill(g,200,232,'MAX. 180 MIN ZUM AUSWEICHFLUGHAFEN',C.up,1);}
+  else{box(g,110,50,180,110,'#0a0f15','#2a3647',8);txt(g,200,80,'SQUAWK',G.nolabel?'#0a0f15':'#7f8b9c',11,'center',700);txt(g,200,115,'7700',(Math.sin(t*.01)>0)?'#f0605d':'#7a2e2c',34,'center',800);pill(g,200,190,'CHECKLISTE → LANDUNG',C.gold,1);}}
+ ,box:{was:'Moderne Verkehrsflugzeuge sind so ausgelegt, dass sie mit einem ausgefallenen Triebwerk sicher weiterfliegen und landen können – sogar beim Start ab V1.',h2:'So reagiert die Crew',
+ erkennen:['Seitenruder gleicht den einseitigen Schub aus','Sinkflug auf niedrigere Höhe (Drift-down)','Notfallcode 7700 im Transponder','Landung am nächsten geeigneten Flughafen'],
+ bedeutung:'Triebwerksausfälle sind sehr selten. Piloten trainieren sie trotzdem regelmäßig im Simulator – genau so wie den Ausfall direkt beim Start.',
+ tipp:'Weitere Transpondercodes: 7600 = Funkausfall, 7500 = Entführung. Fluglotsen sehen den Code sofort auf dem Radar.'}});
+
+les({id:'tcas',cat:'steuer',title:'TCAS – Kollisionswarnung',sub:'Wenn Flugzeuge sich gegenseitig warnen',
+ steps:S([[5000,'TCAS fragt ständig die Transponder der Flugzeuge in der Nähe ab und berechnet, ob sich zwei Flugzeuge zu nahe kommen.'],
+ [5000,'Wird es knapp, kommt zuerst ein Verkehrshinweis: „Traffic, Traffic“. Das fremde Flugzeug wird gelb angezeigt.'],
+ [5600,'Wird es gefährlich, gibt TCAS eine Ausweichanweisung: Ein Flugzeug bekommt „Climb“ (steigen), das andere „Descend“ (sinken).'],
+ [5000,'Beide TCAS-Geräte sprechen sich ab, damit nicht beide in dieselbe Richtung ausweichen.'],
+ [5600,'Regel: Die TCAS-Anweisung wird immer befolgt, auch wenn der Fluglotse etwas anderes sagt. Das lernte man aus dem Unglück von Überlingen 2002.']]),
+ draw(g,st){const{s,p,t}=st;
+  if(s<=1){const cx=200,cy=200;box(g,60,10,280,232,'#05080d','#2a3647',10);for(let r=60;r<=180;r+=60){g.save();g.strokeStyle='#2a3647';g.setLineDash([3,4]);g.beginPath();g.arc(cx,cy,r,Math.PI*1.12,Math.PI*1.88);g.stroke();g.restore();}
+   poly(g,[[cx,cy-12],[cx-8,cy+6],[cx+8,cy+6]],'#ffffff');const d=lerp(170,s===1?80:130,ease(p)),ix=cx+40,iy=cy-d;const col=s===1?'#f5c542':'#c9d2de';
+   poly(g,[[ix,iy-8],[ix+8,iy],[ix,iy+8],[ix-8,iy]],s===1?col:null,col,1.6);txt(g,ix+14,iy-12,'+05',col,10,'left',800);txt(g,ix+14,iy+2,'↓',col,12,'left',800);
+   if(s===1)pill(g,200,232,'„TRAFFIC, TRAFFIC“',C.gold,(Math.sin(t*.012)>-.3)?1:.4);else pill(g,200,232,'TCAS-ANZEIGE',C.mute,1);}
+  else{const f=s===2?ease(p):1,cy=125;const x1=lerp(40,180,(t*.00008*0+.5)),y1=cy-30*f,y2=cy+30*f;
+   const dx=((t*.04)%140);planeSide(g,90+dx*.5,cy-6-34*f,120,{pitch:rad(6)*f});planeSide(g,310-dx*.5,cy+6+34*f,120,{pitch:-rad(5)*f});
+   pill(g,90,36,'„CLIMB, CLIMB“',C.up,1);pill(g,310,220,'„DESCEND, DESCEND“',C.down,1);
+   if(s===3){arrow(g,170,60,230,200,C.gold,1.6,1,true);pill(g,200,130,'ABGESTIMMT',C.gold,1);}
+   if(s===4)pill(g,200,130,'TCAS VOR FLUGLOTSE!',C.gold,1);}}
+ ,box:{was:'TCAS (Traffic Collision Avoidance System) ist ein Warnsystem an Bord, das andere Flugzeuge über deren Transponder erkennt und vor Zusammenstößen warnt.',h2:'So funktioniert’s',
+ erkennen:['<b>TA:</b> Verkehrshinweis „Traffic, Traffic“','<b>RA:</b> Ausweichanweisung „Climb“ oder „Descend“','Beide Flugzeuge weichen gegensinnig aus','Anzeige auf dem Navigationsdisplay'],
+ bedeutung:'TCAS ist das letzte Sicherheitsnetz, falls bei der Flugsicherung etwas schiefgeht. Es reagiert innerhalb von Sekunden, ganz ohne Funk.',
+ tipp:'Bei Überlingen am Bodensee folgte 2002 eine Crew dem Lotsen statt TCAS – beide Flugzeuge stießen zusammen. Seitdem gilt weltweit klar: TCAS hat Vorrang.'}});
+
+/* ---------- Flugreise ---------- */
+les({id:'vereisung',cat:'reise',title:'Vereisung & Enteisung',sub:'Warum Flugzeuge im Winter geduscht werden',
+ steps:S([[5000,'In Wolken gibt es oft unterkühlte Wassertropfen: Sie sind flüssig, obwohl es unter 0 °C ist. Treffen sie auf den Flügel, gefrieren sie sofort.'],
+ [5000,'Eis verändert die Form der Vorderkante. Die Strömung reißt früher ab, der Auftrieb sinkt und das Flugzeug wird schwerer.'],
+ [5200,'Am Boden wird enteist: Fahrzeuge sprühen heiße Enteisungsflüssigkeit (Wasser mit Glykol, oft orange) auf Flügel und Leitwerk.'],
+ [5200,'Bei Schneefall kommt danach eine grüne Schutzflüssigkeit (Typ IV) darauf. Sie verhindert für eine bestimmte Zeit, dass neues Eis anfriert.'],
+ [5000,'Im Flug heizen die Triebwerke mit heißer Zapfluft die Flügelvorderkanten und Triebwerkseinläufe – so bildet sich kein Eis.']]),
+ draw(g,st){const{s,p,t}=st;
+  if(s<=1||s===4){const x=110,y=125,c=200,aoa=rad(4);const ice=s===0?ease(p):s===1?1:0;
+   streams(g,x,y,c,aoa,t,{hs:[-50,-28,-12,12,28,50],stall:s===1&&p>.5,a:.8});foil(g,x,y,c,aoa,C.body,C.bodyLine,2);
+   if(s===0)for(let i=0;i<10;i++){const f=(t*.0012+i/10)%1;circ(g,lerp(0,x,f),y-30+(i%5)*14,2,C.aqua);}
+   if(ice>0){g.save();g.fillStyle='#e6f6ff';g.strokeStyle=C.aqua;g.lineWidth=1.2;g.beginPath();for(let k=0;k<=10;k++){const a=Math.PI/2+k/10*Math.PI;const r=6+ice*10+(k%2)*ice*5;g.lineTo(x+4+Math.cos(a)*r,y-c*.25*Math.sin(aoa)+Math.sin(a)*r);}g.closePath();g.fill();g.stroke();g.restore();pill(g,x-10,y+50,'EIS',C.aqua,1);}
+   if(s===1)pill(g,300,30,'WENIGER AUFTRIEB',C.down,1);if(s===0)pill(g,300,30,'UNTERKÜHLTE TROPFEN',C.aqua,1);
+   if(s===4){g.save();const gr=g.createRadialGradient(x+20,y,2,x+20,y,40);gr.addColorStop(0,hexA(C.down,.6));gr.addColorStop(1,hexA(C.down,0));g.fillStyle=gr;g.fillRect(x-30,y-40,90,80);g.restore();for(let i=0;i<5;i++){const f=(t*.002+i/5)%1;circ(g,x+50-f*40,y+2,2.2,C.down);}pill(g,300,30,'HEISSE ZAPFLUFT',C.down,1);}}
+  else{ground(g,200);planeSide(g,180,150,260,{gear:1});const col=s===2?C.orange:C.up;box(g,300,150,60,40,C.head,C.blockLine,6);line(g,330,150,300,90,C.metal,4);box(g,290,80,20,14,C.head,C.metal,3);
+   for(let i=0;i<14;i++){const f=(t*.002+i/14)%1;circ(g,lerp(290,170,f)+Math.sin(i)*8,lerp(88,120,f)+(i%3)*4,2.6,col);}
+   pill(g,200,30,s===2?'ENTEISEN (ORANGE)':'SCHUTZSCHICHT TYP IV (GRÜN)',col,1);}}
+ ,box:{was:'Vereisung entsteht, wenn unterkühltes Wasser auf das Flugzeug trifft und gefriert. Am Boden wird enteist, im Flug verhindern Heizsysteme die Eisbildung.',h2:'So erkennst du es',
+ erkennen:['Orange Flüssigkeit: Enteisen (heiß)','Grüne Flüssigkeit: Schutz vor neuem Eis','Im Flug: beheizte Vorderkanten','Eiswarnung im Cockpit'],
+ bedeutung:'Schon eine dünne Eisschicht kann den Auftrieb deutlich verringern. Deshalb darf ein Flugzeug mit Eis oder Schnee auf den Flügeln nicht starten.',
+ tipp:'Die Schutzflüssigkeit wirkt nur eine bestimmte Zeit (Holdover Time). Dauert das Warten auf die Startbahn zu lange, muss nochmal enteist werden.'}});
+
+les({id:'seitenwind',cat:'reise',title:'Landen bei Seitenwind',sub:'Schräg anfliegen, gerade aufsetzen',
+ steps:S([[4600,'Der Wind weht quer zur Landebahn. Würde das Flugzeug geradeaus auf die Bahn zeigen, würde es seitlich abgetrieben.'],
+ [5200,'Deshalb fliegt der Pilot schräg an – mit der Nase etwas in den Wind (Vorhaltewinkel). So bleibt das Flugzeug genau über der Mittellinie.'],
+ [5200,'Kurz vor dem Aufsetzen dreht er die Nase mit dem Seitenruder gerade und hält mit dem Querruder die Fläche leicht in den Wind.'],
+ [5000,'Das Flugzeug setzt zuerst mit dem Rad auf der windzugewandten Seite auf. Dann folgt das andere Rad.'],
+ [5000,'Verkehrsflugzeuge dürfen je nach Typ bei Seitenwind bis etwa 30–40 Knoten (55–75 km/h) landen.']]),
+ draw(g,st){const{s,p,t}=st;g.fillStyle=C.ground;g.fillRect(0,0,400,250);g.fillStyle=C.runway;g.fillRect(0,100,400,50);for(let i=0;i<8;i++)box(g,i*55,123,30,4,C.mark,null,1);
+  for(let i=0;i<12;i++){const f=(t*.0009+i/12)%1;const x=(i*37)%400;arrow(g,x,lerp(0,250,f)-14,x,lerp(0,250,f),hexA(C.aqua,.6),1.4,1);}
+  pill(g,40,20,'WIND ↓',C.aqua,1,'left');
+  const fx=(t*.00006)%1;const px=lerp(20,330,s===3||s===4?.85:fx);
+  let ang=0,dy=0;if(s===0){dy=fx*60;ang=0;}else if(s===1){ang=-.28;}else if(s===2){ang=-.28*(1-ease(p));}
+  planeTop(g,px,125+dy,70,ang,{rud:s===2?.4:null});
+  if(s===0)pill(g,200,232,'WIRD ABGETRIEBEN',C.down,1);if(s===1)pill(g,200,232,'VORHALTEWINKEL',C.gold,1);if(s===2)pill(g,200,232,'NASE GERADE DREHEN',C.gold,1);
+  if(s===3)pill(g,200,232,'LUV-RAD ZUERST',C.up,1);if(s===4)pill(g,200,232,'LIMIT ≈ 30–40 KNOTEN',C.text,1);}
+ ,box:{was:'Bei Seitenwind weht der Wind schräg oder quer zur Landebahn. Piloten gleichen ihn mit einem Vorhaltewinkel und gezieltem Ruder-Einsatz aus.',h2:'So geht’s',
+ erkennen:['Anflug schräg zur Bahn (Crab)','Kurz vor dem Aufsetzen: Nase gerade (De-Crab)','Fläche leicht in den Wind hängen','Windzugewandtes Rad setzt zuerst auf'],
+ bedeutung:'Start- und Landebahnen werden so gebaut, dass sie meist in Hauptwindrichtung liegen. Große Flughäfen haben oft Bahnen in verschiedene Richtungen.',
+ tipp:'Bei Sturm zeigen Videos von „Crosswind-Landungen“, wie schräg Flugzeuge anfliegen – das sieht wild aus, ist aber ganz normales Handwerk.'}});
+
+les({id:'blackbox',cat:'reise',title:'Die Black Box',sub:'Flugschreiber – und warum sie orange ist',
+ steps:S([[4600,'Jedes Verkehrsflugzeug hat Flugschreiber an Bord. Sie sitzen meist im Heck, weil es dort bei einem Unfall am sichersten ist.'],
+ [4600,'Obwohl sie „Black Box“ heißen, sind sie leuchtend orange – damit man sie nach einem Unfall schnell findet.'],
+ [5200,'Der Flugdatenschreiber (FDR) zeichnet tausende Werte auf: Höhe, Tempo, Ruderstellungen, Triebwerksdaten … mindestens die letzten 25 Stunden.'],
+ [5200,'Der Stimmenrekorder (CVR) nimmt alle Gespräche und Geräusche im Cockpit auf – bei neuen Flugzeugen ebenfalls die letzten 25 Stunden.'],
+ [5600,'Sie sind extrem robust: Sie überstehen 3.400-fache Erdbeschleunigung, eine Stunde Feuer mit 1.100 °C und senden unter Wasser 90 Tage lang ein Peilsignal.']]),
+ draw(g,st){const{s,p,t}=st;
+  if(s===0){const P=planeSide(g,200,125,340,{});const q=P(-.4,-.02);box(g,q[0]-12,q[1]-6,24,12,'#ff7a1a',null,2);tag(g,q[0],q[1],80,40,'FLUGSCHREIBER',C.orange,1);return;}
+  const bx=(x,y,lab)=>{box(g,x,y,90,60,'#ff7a1a','#b45000',6,2);for(let i=0;i<4;i++)line(g,x+10+i*20,y+4,x+20+i*20,y+14,'#ffd23f',3);txt(g,x+45,y+38,G.nolabel?'':lab,'#1b1505',13,'center',800);};
+  if(s===1){bx(90,90,'FDR');bx(220,90,'CVR');pill(g,200,40,'ORANGE, NICHT SCHWARZ!',C.orange,1);return;}
+  if(s===2){bx(30,95,'FDR');const x0=150,y0=40;for(let k=0;k<4;k++){plot(g,u=>.5+.4*Math.sin(u*10+k*1.7+t*.003),x0,y0+40+k*48,230,36,[C.up,C.blue,C.gold,C.purple][k],1.6,1,1);}pill(g,260,232,'TAUSENDE MESSWERTE',C.up,1);return;}
+  if(s===3){bx(30,95,'CVR');g.strokeStyle=C.aqua;g.lineWidth=1.5;g.beginPath();for(let x=150;x<390;x+=2){const a=Math.sin(x*.09+t*.02)*Math.sin(x*.013+t*.004)*36;g.lineTo(x,125+a);}g.stroke();pill(g,270,40,'COCKPIT-GESPRÄCHE',C.aqua,1);pill(g,270,220,'LETZTE 25 STUNDEN',C.aqua,1);return;}
+  bx(30,95,'FDR');const L=[['3.400 g Aufprall',C.text],['1.100 °C · 1 Stunde',C.down],['Peilsender 90 Tage',C.aqua]];L.forEach(([n,col],i)=>pill(g,160,60+i*50,n,col,clamp(p*4-i),'left',12));}
+ ,box:{was:'Die „Black Box“ besteht aus zwei Flugschreibern: dem Flugdatenschreiber (FDR) und dem Cockpit-Stimmenrekorder (CVR). Sie helfen, Unfälle aufzuklären.',h2:'So erkennst du sie',
+ erkennen:['Leuchtend orange mit Reflektorstreifen','Meist im Heck eingebaut','<b>FDR:</b> Flugdaten · <b>CVR:</b> Cockpit-Ton','Unterwassersender zum Wiederfinden'],
+ bedeutung:'Fast jede Sicherheitsverbesserung der letzten Jahrzehnte beruht auf Erkenntnissen aus Flugschreibern. Aus jedem Unfall wird gelernt.',
+ tipp:'Die Daten werden auch im normalen Betrieb ausgewertet: Airlines prüfen so z. B., ob Landungen zu hart waren – lange bevor etwas passiert.'}});
+
+/* ---------- Besondere Flugzeuge ---------- */
+les({id:'hubschrauber',cat:'spezial',title:'Wie fliegt ein Hubschrauber?',sub:'Drehende Flügel statt fester Flügel',
+ steps:S([[4600,'Die Rotorblätter eines Hubschraubers sind schmale Flügel, die sich im Kreis drehen. Sie erzeugen Auftrieb, auch wenn der Hubschrauber stillsteht.'],
+ [5200,'Kollektive Blattverstellung: Der Pilot stellt alle Blätter gleichzeitig steiler. Mehr Auftrieb – der Hubschrauber steigt senkrecht.'],
+ [5200,'Zyklische Blattverstellung: Die Rotorscheibe kippt nach vorne. Ein Teil des Auftriebs zieht nun nach vorne – der Hubschrauber fliegt los.'],
+ [5200,'Der Hauptrotor will den Rumpf in die Gegenrichtung drehen (Drehmoment). Der Heckrotor drückt dagegen und steuert die Richtung.']]),
+ draw(g,st){const{s,p,t}=st;ground(g,215);
+  if(s===0){heli(g,200,150,220,{t,hl:true});for(let i=0;i<8;i++){const f=(t*.002+i/8)%1;circ(g,120+i*22,60+f*80,2,C.blue);}pill(g,200,26,'ROTORBLATT = FLÜGEL',C.gold,1);}
+  if(s===1){const y=lerp(170,110,ease(p));heli(g,200,y,220,{t,hl:true});arrow(g,200,y-48,200,y-90,C.up,4,1);pill(g,300,40,'ALLE BLÄTTER STEILER',C.gold,1);}
+  if(s===2){const x=lerp(150,260,ease(p));heli(g,x,120,220,{t,tilt:-.18,pitch:-.12});arrow(g,x,74,x+50,54,C.up,3,1);pill(g,80,40,'ROTOR KIPPT NACH VORNE',C.gold,1,'left');clouds(g,t,.05,.6);}
+  if(s===3){const cx=200,cy=125;g.save();g.translate(cx,cy);g.beginPath();g.ellipse(0,0,30,18,0,0,TAU);g.fillStyle=C.body;g.fill();g.strokeStyle=C.bodyLine;g.stroke();box(g,-130,-4,100,8,C.body,C.bodyLine,3);g.restore();
+   const a=t*.01;for(let k=0;k<2;k++){const an=a+k*Math.PI;line(g,cx-Math.cos(an)*110,cy-Math.sin(an)*110,cx+Math.cos(an)*110,cy+Math.sin(an)*110,C.metal2,4);}
+   g.save();g.strokeStyle=C.down;g.lineWidth=2;g.beginPath();g.arc(cx,cy,50,0.4,1.6);g.stroke();g.restore();arrowHead(g,cx+Math.cos(1.5)*50,cy+Math.sin(1.5)*50,cx+Math.cos(1.6)*50,cy+Math.sin(1.6)*50,C.down,9);pill(g,cx+60,cy+58,'DREHMOMENT',C.down,1);
+   arrow(g,cx-125,cy+10,cx-125,cy-30,C.gold,3,1);pill(g,cx-125,cy+30,'HECKROTOR',C.gold,1);pill(g,200,232,'VON OBEN',C.mute,1);}}
+ ,box:{was:'Ein Hubschrauber erzeugt Auftrieb mit einem drehenden Rotor. Dadurch kann er senkrecht starten, in der Luft stehen bleiben und in jede Richtung fliegen.',h2:'So wird gesteuert',
+ erkennen:['<b>Kollektiv:</b> alle Blätter gleich → steigen/sinken','<b>Zyklisch:</b> Rotorscheibe kippen → Richtung','<b>Pedale:</b> Heckrotor → drehen um die Hochachse','Rotor dreht mit gleichbleibender Drehzahl'],
+ bedeutung:'Hubschrauber sind langsamer und verbrauchen mehr als Flugzeuge, können aber überall landen. Deshalb sind sie unverzichtbar für Rettungsflüge, Polizei und Bergrettung.',
+ tipp:'Fällt das Triebwerk aus, kann ein Hubschrauber trotzdem landen: Bei der Autorotation treibt der Fahrtwind den Rotor an, ähnlich wie bei einem fallenden Ahornsamen.'}});
+
+les({id:'segelflug',cat:'spezial',title:'Segelflug & Thermik',sub:'Stundenlang fliegen ohne Motor',
+ steps:S([[5200,'Ein Segelflugzeug hat keinen Motor. Es gleitet immer leicht bergab – aber sehr flach: Moderne Segler haben eine Gleitzahl von etwa 50.'],
+ [5000,'Gleitzahl 50 heißt: Aus 1 km Höhe gleitet es 50 km weit. Das schaffen sie dank sehr langer, schmaler Flügel.'],
+ [5200,'Thermik: Die Sonne erwärmt den Boden ungleichmäßig. Über warmen Flächen steigt eine Blase warmer Luft nach oben.'],
+ [5600,'Der Pilot kreist in der aufsteigenden Luft – wie ein Bussard. Steigt die Luft schneller, als er sinkt, gewinnt er Höhe.'],
+ [5000,'Oben, wo die warme Luft abkühlt, entsteht oft eine Quellwolke (Cumulus). Sie zeigt den Piloten, wo die nächste Thermik ist.']]),
+ draw(g,st){const{s,p,t}=st;const gy=215;ground(g,gy);
+  if(s<=1){const f=(t*.00005)%1,x=lerp(20,380,f),y=lerp(60,gy-20,s===0?f*.3:f*.2);glider(g,x,y,90,rad(1.5));
+   if(s===1){line(g,20,60,20,gy,C.gold,1.6);line(g,20,gy-4,380,gy-4,C.orange,1.6);pill(g,40,(60+gy)/2,'1 km',C.gold,1,'left');pill(g,200,gy+18,'50 km',C.orange,1);}
+   pill(g,330,30,'GLEITZAHL ≈ 50',C.up,1);}
+  else{const tx=200;g.save();g.fillStyle=hexA(C.fire,.35);g.fillRect(150,gy,100,6);g.restore();
+   for(let i=0;i<10;i++){const f=(t*.0006+i/10)%1;circ(g,tx-30+(i%5)*15,lerp(gy-6,40,f),3+f*4,hexA(C.fire,.5*(1-f)));}
+   pill(g,tx,gy+20,'WARMER BODEN',C.fire,1);if(s>=2)arrow(g,tx+70,190,tx+70,80,C.fire,2.4,1);
+   if(s>=3){const a=t*.002,h=s===3?lerp(170,70,ease(p)):70;const x=tx+Math.cos(a)*55,y=h+Math.sin(a)*8;glider(g,x,y,70,0);pill(g,330,30,'KREISEN = STEIGEN',C.up,1);}
+   if(s===4){cloud(g,tx-30,34,1.6,hexA(C.mute,.45));pill(g,tx-120,30,'CUMULUS',C.mute,1);}}}
+ ,box:{was:'Segelflugzeuge fliegen ohne Motor. Sie gleiten sehr flach und nutzen aufsteigende Luft (Thermik, Hangaufwind), um Höhe zu gewinnen.',h2:'So funktioniert’s',
+ erkennen:['Sehr lange, schmale Flügel','Gleitzahl 40–60 (Verkehrsflugzeug ca. 17)','Kreisen in der Thermik','Start per Winde oder Schleppflugzeug'],
+ bedeutung:'Gute Segelflieger fliegen an einem Sommertag über 1.000 km weit – nur mit Sonnenenergie in Form von Thermik.',
+ tipp:'Achte im Sommer auf kreisende Greifvögel: Sie zeigen genau wie Quellwolken, wo Thermik ist. Segelflieger fliegen oft mit ihnen zusammen.'}});
+
+les({id:'ueberschall',cat:'spezial',title:'Überschall & Concorde',sub:'Die Schallmauer durchbrechen',
+ steps:S([[4800,'Ein Flugzeug erzeugt ständig Druckwellen, die sich mit Schallgeschwindigkeit ausbreiten (am Boden ca. 1.225 km/h). Langsamer als der Schall laufen die Wellen voraus.'],
+ [5000,'Bei Mach 1 fliegt das Flugzeug genauso schnell wie seine eigenen Wellen. Sie stauen sich vor der Nase zu einer starken Druckwand – der „Schallmauer“.'],
+ [5000,'Schneller als der Schall bleiben die Wellen hinter dem Flugzeug zurück und bilden einen Kegel: den Machschen Kegel.'],
+ [5200,'Wo der Kegel den Boden trifft, hört man einen lauten Doppelknall – den Überschallknall. Deshalb darf über Land meist nicht mit Überschall geflogen werden.'],
+ [5600,'Die Concorde flog mit Mach 2,04 (ca. 2.180 km/h) in 18 km Höhe – Paris–New York in etwa 3,5 Stunden. 2003 wurde sie ausgemustert.']]),
+ draw(g,st){const{s,p,t}=st;const M=s===0?.6:s===1?1:2;const py=s===3?70:125;const px=s===3?260:280;
+  if(s===3)ground(g,215);
+  const T=1800,vs=.05;for(let k=0;k<9;k++){const age=((t+k*T/9)%T);const ex=px-age*vs*M,r=age*vs;g.save();g.strokeStyle=hexA(C.aqua,.6*(1-age/T));g.lineWidth=1.4;g.beginPath();g.arc(ex,py,r,0,TAU);g.stroke();g.restore();}
+  if(s>=2){const ang=Math.asin(1/M);const L=400;g.save();g.strokeStyle=C.gold;g.lineWidth=2.4;g.beginPath();g.moveTo(px-L*Math.cos(ang),py-L*Math.sin(ang));g.lineTo(px,py);g.lineTo(px-L*Math.cos(ang),py+L*Math.sin(ang));g.stroke();g.restore();}
+  if(s===4){g.save();g.translate(px,py);g.scale(130,130);const lw=1.5/130;poly(g,[[.6,0],[.3,-.04],[-.5,-.03],[-.5,.03],[.3,.04]],C.body,C.bodyLine,lw);poly(g,[[.1,0],[-.45,-.0],[-.45,.03],[.1,.02]],C.bodyLine,null);poly(g,[[-.3,-.03],[-.48,-.22],[-.5,-.22],[-.47,-.03]],C.body,C.bodyLine,lw);g.restore();}
+  else planeSide(g,px,py,70,{});
+  pill(g,40,26,`MACH ${deN(M,M===2?0:1)}`,s>=2?C.gold:C.aqua,1,'left');
+  if(s===1)pill(g,330,220,'SCHALLMAUER',C.gold,1);if(s===2)pill(g,330,220,'MACHSCHER KEGEL',C.gold,1);
+  if(s===3){const hx=px-(215-py)/Math.tan(Math.asin(1/M));circ(g,hx,205,5,C.text);pill(g,hx,232,'BOOM-BOOM!',C.down,1);}
+  if(s===4){pill(g,200,200,'MACH 2,04 · 18 km HÖHE',C.gold,1);pill(g,200,226,'PARIS → NEW YORK ≈ 3,5 h',C.text,1);}}
+ ,box:{was:'Überschallflug heißt: schneller fliegen als der Schall. Dabei bildet sich ein Kegel aus Druckwellen, der am Boden als Knall zu hören ist.',h2:'So erkennst du es',
+ erkennen:['Mach 1 = Schallgeschwindigkeit','Schallgeschwindigkeit sinkt mit der Temperatur','Machscher Kegel hinter dem Flugzeug','Doppelknall am Boden'],
+ bedeutung:'Überschallflug braucht viel mehr Treibstoff und ist sehr laut. Deshalb gibt es seit der Concorde kein Überschall-Passagierflugzeug mehr im Linienbetrieb.',
+ tipp:'Die Concorde wurde im Flug durch die Reibungshitze rund 20 cm länger. Die Außenhaut wurde an der Nase über 120 °C heiß.'}});
+
+les({id:'kampfjet',cat:'spezial',title:'Kampfjet & Nachbrenner',sub:'Extrem viel Schub – für kurze Zeit',
+ steps:S([[4800,'Kampfjets haben schlanke Triebwerke mit wenig Nebenstrom. Sie liefern einen schnellen, heißen Strahl – gut für hohe Geschwindigkeiten.'],
+ [5000,'Nachbrenner: Hinter der Turbine wird noch einmal Kerosin in den heißen Abgasstrahl gespritzt und verbrannt.'],
+ [5000,'Der Strahl wird noch heißer und schneller. Man sieht eine lange Flamme mit hellen Ringen – den „Machschen Knoten“.'],
+ [5200,'Der Schub steigt stark: Ein Triebwerk des Eurofighters liefert ohne Nachbrenner ca. 60 kN, mit Nachbrenner ca. 90 kN. Der Verbrauch steigt aber um ein Vielfaches.'],
+ [5000,'Ist der Schub größer als das Gewicht, kann ein Jet sogar senkrecht nach oben beschleunigen.']]),
+ draw(g,st){const{s,p,t}=st;
+  if(s<=3){const ab=s===0?0:s===1?ease(p)*.5:1;const X=jetEngine(g,20,125,250,60,t,{hl:s===1?'du':''});
+   if(ab>0){const L=110*ab;const gr=g.createLinearGradient(270,0,270+L,0);gr.addColorStop(0,hexA(C.fire2,.95));gr.addColorStop(1,hexA(C.fire,0));g.fillStyle=gr;g.beginPath();g.moveTo(270,105);g.lineTo(270+L,118);g.lineTo(270+L,132);g.lineTo(270,145);g.closePath();g.fill();
+    if(s>=2)for(let k=0;k<4;k++){const x=285+k*24;poly(g,[[x,125],[x+8,118],[x+16,125],[x+8,132]],hexA('#ffffff',.7));}}
+   if(s===1){for(let i=0;i<5;i++){const f=(t*.003+i/5)%1;circ(g,262+f*14,110+i*8,2,C.fuel);}pill(g,300,40,'KEROSIN IN DEN STRAHL',C.fuel,1);}
+   if(s===2)pill(g,320,190,'MACHSCHE KNOTEN',C.gold,1);
+   if(s===3){box(g,40,200,60*2.2,14,C.mute,null,4);box(g,40,224,90*2.2,14,C.fire,null,4);pill(g,40+132+40,207,'60 kN',C.mute,1);pill(g,40+198+40,231,'90 kN',C.fire,1);}
+   if(s===0)pill(g,200,26,'SCHLANKES TRIEBWERK',C.text,1);}
+  else{const y=lerp(220,60,(t*.0003)%1);g.save();g.translate(200,y);g.rotate(-Math.PI/2);planeTop(g,0,0,90,0,{});g.restore();for(let i=0;i<8;i++){const f=(t*.004+i/8)%1;circ(g,200+((i%3)-1)*4,y+45+f*60,3*(1-f)+1,hexA(C.fire,1-f));}pill(g,320,40,'SCHUB > GEWICHT',C.up,1);}}
+ ,box:{was:'Der Nachbrenner verbrennt zusätzlich Kerosin im Abgasstrahl hinter der Turbine. Das bringt viel mehr Schub für Start, Steigflug oder Überschall.',h2:'So erkennst du ihn',
+ erkennen:['Lange, helle Flamme hinter dem Triebwerk','Ringe im Strahl (Machsche Knoten)','Sehr laut','Nur kurz genutzt wegen hohen Verbrauchs'],
+ bedeutung:'Ohne Nachbrenner kommen viele Kampfjets nicht über Mach 1. Die Concorde nutzte ihn ebenfalls, um die Schallmauer zu durchbrechen.',
+ tipp:'Bei Flugtagen sieht man die Nachbrenner-Flamme am besten in der Dämmerung – die Machschen Knoten leuchten dann wie Perlen an einer Schnur.'}});
+
+les({id:'riesen',cat:'spezial',title:'Riesen der Lüfte',sub:'A380, Boeing 747, An-225 und Beluga',
+ steps:S([[4800,'Der Airbus A380 ist das größte Passagierflugzeug: 72,7 m lang, 79,8 m Spannweite und zwei Passagierdecks übereinander.'],
+ [5000,'Spannweite im Vergleich: A320 35,8 m – Boeing 747-8 68,4 m – A380 79,8 m – Antonow An-225 88,4 m.'],
+ [5000,'Maximales Startgewicht: A320 78 t – Boeing 747-8 448 t – A380 575 t – An-225 640 t.'],
+ [5200,'Die An-225 „Mrija“ war das schwerste Flugzeug der Welt. Es gab nur ein Exemplar – es wurde 2022 im Krieg in der Ukraine zerstört.'],
+ [5000,'Der Beluga XL transportiert Rumpfteile und Flügel zwischen den Airbus-Werken. Sein Laderaum ist so groß, dass zwei A350-Flügel hineinpassen.']]),
+ draw(g,st){const{s,p,t}=st;const D=[['A320',35.8,78,C.blue],['747-8',68.4,448,C.purple],['A380',79.8,575,C.gold],['An-225',88.4,640,C.orange]];
+  if(s===0){planeTop(g,200,125,72.7*2.6,0,{});g.save();g.globalAlpha=.9;planeTop(g,200,125,37.6*2.6,0,{hl:'rumpf'});g.restore();pill(g,200,22,'A380 VS. A320 (GLEICHER MASSSTAB)',C.text,1);return;}
+  if(s===1||s===2){const k=s===1?1:2,mx=s===1?90:650;D.forEach((d,i)=>{const y=50+i*48,f=ease(clamp(p*1.6-i*.15));pill(g,20,y,d[0],d[3],1,'left');box(g,100,y-9,(280)*d[k]/mx*f,18,hexA(d[3],.7),null,4);pill(g,100+280*d[k]/mx*f+6,y,s===1?`${deN(d[1],1)} m`:`${deN(d[2])} t`,d[3],f,'left');});pill(g,200,232,s===1?'SPANNWEITE':'MAX. STARTGEWICHT',C.mute,1);return;}
+  if(s===3){clouds(g,t,.04);planeSide(g,200,125,330,{nowin:true});pill(g,200,30,'AN-225 „MRIJA“ · 1 EXEMPLAR',C.orange,1);pill(g,200,226,'2022 ZERSTÖRT',C.down,1);return;}
+  clouds(g,t,.05);planeSide(g,200,140,300,{nowin:true});g.save();g.beginPath();g.ellipse(215,140-34,120,42,0,Math.PI,TAU);g.lineTo(95,140-30);g.fillStyle=C.body;g.fill();g.strokeStyle=C.bodyLine;g.lineWidth=1.5;g.stroke();g.restore();
+  circ(g,335,120,4,C.bodyLine);g.beginPath();g.arc(340,124,6,.2,1.2);g.strokeStyle=C.bodyLine;g.stroke();pill(g,200,30,'BELUGA XL',C.text,1);pill(g,215,90,'RIESIGER LADERAUM',C.gold,1);}
+ ,box:{was:'Die größten Flugzeuge der Welt transportieren hunderte Passagiere oder riesige Frachtstücke. Spannweite und Startgewicht zeigen ihre Größe.',h2:'Im Vergleich',
+ erkennen:['<b>A380:</b> größtes Passagierflugzeug','<b>Boeing 747:</b> der „Jumbo“, seit 1970','<b>An-225:</b> schwerstes Flugzeug (640 t)','<b>Beluga XL:</b> Transporter für Airbus-Bauteile'],
+ bedeutung:'Große Flugzeuge brauchen besondere Flughäfen: breite Rollwege, starke Bahnen und Fluggastbrücken für zwei Decks. In München landet der A380 regelmäßig.',
+ tipp:'Ein A380 kann bis zu 853 Passagiere befördern – in der Praxis sind es mit mehreren Klassen meist 450 bis 550.'}});
+
+/* Reihenfolge nach Bereichen sortieren (stabil) */
+LESSONS.sort((a,b)=>Object.keys(CATS).indexOf(a.cat)-Object.keys(CATS).indexOf(b.cat));
+
 /* ============ Bereiche ============ */
 const CATINFO_F={
- aero:{d:'Kräfte, Flügelprofil, Anstellwinkel, Auftriebsformel und Klappen.',acc:'var(--blue)',hex:'#4c9aff'},
- antrieb:{d:'Propeller, Strahltriebwerk, Turbofan, Schubumkehr und Verbrauch.',acc:'var(--orange)',hex:'#ff9f43'},
- bau:{d:'Aufbau, Rumpf, Flügel, Werkstoffe und Prüfung mit Röntgen und CT.',acc:'var(--purple)',hex:'#b388ff'},
- steuer:{d:'Drei Achsen, Kurvenflug, Ruder, Instrumente und Fly-by-Wire.',acc:'var(--up)',hex:'#1fcf8f'},
- reise:{d:'Start, Reiseflughöhe, Navigation, ILS-Landung und Jetstream.',acc:'var(--aqua)',hex:'#22d3ee'}};
+ aero:{d:'Kräfte, Flügelprofil, Strömungsabriss, Auftriebsformel, Klappen, Randwirbel und Bodeneffekt.',acc:'var(--blue)',hex:'#4c9aff'},
+ antrieb:{d:'Propeller, Strahltriebwerk, Turbofan, Schubumkehr, Verbrauch, APU und Vogelschlag.',acc:'var(--orange)',hex:'#ff9f43'},
+ bau:{d:'Aufbau, Rumpf, Flügel, Werkstoffe, Röntgen & CT, Endmontage, Wartung und Blitzschlag.',acc:'var(--purple)',hex:'#b388ff'},
+ steuer:{d:'Drei Achsen, Kurvenflug, Ruder, Instrumente, Fly-by-Wire, Triebwerksausfall und TCAS.',acc:'var(--up)',hex:'#1fcf8f'},
+ reise:{d:'Start, Reiseflughöhe, Navigation, ILS-Landung, Jetstream, Vereisung, Seitenwind und Black Box.',acc:'var(--aqua)',hex:'#22d3ee'},
+ spezial:{d:'Hubschrauber, Segelflug, Überschall, Kampfjet und die Riesen der Lüfte.',acc:'var(--pink)',hex:'#ff6fae'}};
 const SVGI_F={
  aero:'<path d="M6 38 C14 22 40 18 58 30 C44 34 22 38 6 38 Z" fill="none" stroke="currentColor" stroke-width="3"/><path d="M30 24 V6" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/><path d="M24 12 L30 5 L36 12" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 50 H40 M10 58 H50" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" opacity=".6"/>',
  antrieb:'<rect x="8" y="16" width="44" height="32" rx="12" fill="none" stroke="currentColor" stroke-width="3"/><g stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="44"/><line x1="24" y1="22" x2="24" y2="42"/><line x1="36" y1="24" x2="36" y2="40"/></g><path d="M52 26 L60 32 L52 38" fill="currentColor"/><circle cx="30" cy="32" r="3" fill="currentColor"/>',
  bau:'<circle cx="28" cy="32" r="20" fill="none" stroke="currentColor" stroke-width="3"/><circle cx="28" cy="32" r="14" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="3 4"/><line x1="10" y1="38" x2="46" y2="38" stroke="currentColor" stroke-width="3"/><path d="M50 10 L58 18 M54 14 L46 22" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>',
  steuer:'<circle cx="32" cy="32" r="24" fill="none" stroke="currentColor" stroke-width="3"/><path d="M8 34 H56" stroke="currentColor" stroke-width="3"/><path d="M16 34 A16 16 0 0 0 48 34 Z" fill="currentColor" opacity=".35"/><path d="M20 30 H28 L32 34 L36 30 H44" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linejoin="round"/>',
+ spezial:'<ellipse cx="30" cy="38" rx="14" ry="9" fill="none" stroke="currentColor" stroke-width="3"/><path d="M16 38 H4 M4 32 V44" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><path d="M30 29 V20 M6 18 H54" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/><path d="M22 50 L20 56 M38 50 L40 56 M14 56 H46" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>',
  reise:'<path d="M8 50 Q32 6 56 18" fill="none" stroke="currentColor" stroke-width="3" stroke-dasharray="4 4"/><path d="M50 10 L60 16 L50 22 L52 16 Z" fill="currentColor"/><circle cx="8" cy="50" r="5" fill="currentColor"/><path d="M2 58 H62" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>'};
 
 /* ============ Quiz-Daten ============ */
@@ -996,6 +1360,40 @@ const PQ_F=[
  {l:'ils',s:1,p:.5,q:'Was zeigt die gestrichelte Linie zur Bahn?',a:['Den 3°-Gleitweg des ILS','Die Startstrecke','Den Jetstream','Eine Luftstraße'],e:'Der Gleitwegsender führt das Flugzeug im 3°-Winkel zur Bahn.'},
  {l:'turbofan',s:1,p:.5,q:'Welcher Luftstrom ist hier markiert?',a:['Der Nebenstrom (Bypass)','Der Kernstrom','Der Abgasstrahl','Die Kabinenluft'],e:'Die Luft strömt außen am heißen Kern vorbei.'}
 ];
+TQ_F.push(
+ {q:'Wo entstehen Randwirbel?',a:['An den Flügelspitzen','Am Triebwerkseinlass','Im Cockpit','Am Fahrwerk'],e:'Luft strömt vom Überdruck unten zum Unterdruck oben um die Flügelspitze.',l:'wirbel'},
+ {q:'Wozu dienen Winglets?',a:['Sie schwächen die Randwirbel und sparen Kerosin','Sie dienen als Antenne','Sie lenken das Flugzeug','Sie kühlen den Tank'],e:'Weniger Wirbel = weniger Widerstand, etwa 3–5 % Ersparnis.',l:'wirbel'},
+ {q:'Ab welcher Höhe wirkt der Bodeneffekt ungefähr?',a:['Unter etwa einer Spannweite','Unter 10 km','Erst unter 1 m','Nur über Wasser'],e:'Je näher am Boden, desto stärker das Luftkissen.',l:'bodeneffekt'},
+ {q:'Was liefert die APU am Boden?',a:['Strom und Druckluft','Nur Kerosin','Hydrauliköl','Frischwasser'],e:'Damit laufen Licht, Klimaanlage und der Triebwerksstart.',l:'apu'},
+ {q:'Was passiert beim Blade-off-Test?',a:['Eine Fanschaufel wird bei Vollgas abgesprengt','Die Triebwerke werden gewaschen','Ein Vogel wird gezählt','Die Schaufeln werden lackiert'],e:'Das Gehäuse muss alle Teile sicher auffangen.',l:'vogelschlag'},
+ {q:'Womit werden große Airbus-Bauteile zwischen den Werken transportiert?',a:['Mit dem Beluga-Frachtflugzeug','Mit dem Zug','Mit dem Hubschrauber','Mit der Post'],e:'Der Beluga hat einen riesigen Laderaum, z. B. für Flügel und Rumpfteile.',l:'endmontage'},
+ {q:'Welcher Check ist die große Generalüberholung eines Flugzeugs?',a:['D-Check','A-Check','Walkaround','B-Check'],e:'Beim D-Check wird das Flugzeug fast komplett zerlegt.',l:'wartung'},
+ {q:'Wie oft wird ein Verkehrsflugzeug im Schnitt vom Blitz getroffen?',a:['Etwa einmal pro Jahr','Nie','Jeden Tag','Einmal in 100 Jahren'],e:'Der Strom fließt über die Außenhaut ab – das Innere bleibt geschützt.',l:'blitz'},
+ {q:'Warum ist man bei einem Blitzschlag im Flugzeug geschützt?',a:['Die Hülle wirkt wie ein Faradayscher Käfig','Weil Gummireifen isolieren','Weil Blitze Flugzeuge meiden','Weil der Pilot ausweicht'],e:'Der Strom fließt außen über die leitende Hülle.',l:'blitz'},
+ {q:'Was macht der Pilot bei einem Triebwerksausfall gegen das Drehen zur Seite?',a:['Er hält mit dem Seitenruder dagegen','Er fährt das Fahrwerk aus','Er schaltet das andere Triebwerk ab','Nichts'],e:'Das Seitenruder gleicht den einseitigen Schub aus.',l:'notfall'},
+ {q:'Welcher Transpondercode bedeutet „Notfall“?',a:['7700','7600','1234','0000'],e:'7600 = Funkausfall, 7500 = Entführung.',l:'notfall'},
+ {q:'TCAS sagt „Climb“, der Lotse sagt „Descend“. Was gilt?',a:['TCAS befolgen','Dem Lotsen folgen','Geradeaus weiterfliegen','Abwarten'],e:'Seit Überlingen 2002 gilt weltweit: TCAS hat Vorrang.',l:'tcas'},
+ {q:'Welche Farbe hat die Schutzflüssigkeit Typ IV gegen neues Eis?',a:['Grün','Orange','Blau','Schwarz'],e:'Orange ist meist die heiße Enteisungsflüssigkeit, grün die Schutzschicht.',l:'vereisung'},
+ {q:'Wie heißt der schräge Anflug bei Seitenwind?',a:['Vorhaltewinkel (Crab)','Rollen','Durchstarten','Schweben'],e:'Die Nase zeigt etwas in den Wind, damit das Flugzeug über der Mittellinie bleibt.',l:'seitenwind'},
+ {q:'Welche Farbe haben „Black Boxes“ wirklich?',a:['Orange','Schwarz','Weiß','Grün'],e:'Damit man sie nach einem Unfall schnell findet.',l:'blackbox'},
+ {q:'Was zeichnet der CVR auf?',a:['Gespräche und Geräusche im Cockpit','Die Flughöhe','Die Passagierliste','Das Wetter'],e:'Der FDR speichert dagegen die Flugdaten.',l:'blackbox'},
+ {q:'Wie steuert ein Hubschrauber das Steigen?',a:['Alle Rotorblätter werden gleichzeitig steiler gestellt (kollektiv)','Mit dem Heckrotor','Mit Landeklappen','Mit einem Propeller vorne'],e:'Mehr Blattwinkel = mehr Auftrieb.',l:'hubschrauber'},
+ {q:'Wozu hat ein Hubschrauber einen Heckrotor?',a:['Gegen das Drehmoment des Hauptrotors','Für mehr Tempo','Zum Bremsen','Zur Kühlung'],e:'Ohne Heckrotor würde sich der Rumpf gegen den Rotor drehen.',l:'hubschrauber'},
+ {q:'Gleitzahl 50: Wie weit gleitet ein Segler aus 2 km Höhe?',a:['100 km','50 km','25 km','2 km'],e:'2 km × 50 = 100 km.',l:'segelflug'},
+ {q:'Was ist Thermik?',a:['Aufsteigende warme Luft','Ein Gewitter','Ein Triebwerkstyp','Kalter Fallwind'],e:'Die Sonne erwärmt den Boden, die warme Luft steigt auf.',l:'segelflug'},
+ {q:'Wie schnell flog die Concorde?',a:['Mach 2,04 (ca. 2.180 km/h)','Mach 0,8','Mach 5','Mach 1,0'],e:'Paris–New York in etwa 3,5 Stunden.',l:'ueberschall'},
+ {q:'Was erzeugt am Boden den Überschallknall?',a:['Der Machsche Kegel aus Druckwellen','Das Fahrwerk','Der Nachbrenner allein','Die Schubumkehr'],e:'Wo der Kegel den Boden trifft, hört man den Doppelknall.',l:'ueberschall'},
+ {q:'Was passiert im Nachbrenner?',a:['Kerosin wird hinter der Turbine im Abgasstrahl verbrannt','Luft wird gekühlt','Der Fan wird abgeschaltet','Abgas wird gefiltert'],e:'Das bringt viel mehr Schub, kostet aber sehr viel Treibstoff.',l:'kampfjet'},
+ {q:'Welches war das schwerste Flugzeug der Welt?',a:['Antonow An-225','Airbus A380','Boeing 747-8','Concorde'],e:'640 t maximales Startgewicht – 2022 zerstört.',l:'riesen'}
+);
+PQ_F.push(
+ {l:'wirbel',s:1,p:.5,q:'Was entsteht hier an den Flügelspitzen?',a:['Randwirbel','Eis','Blitze','Abgas'],e:'Luft strömt von unten nach oben um die Flügelspitze.'},
+ {l:'hubschrauber',s:2,p:.6,q:'Wie bewegt sich der Hubschrauber hier?',a:['Er fliegt vorwärts, weil die Rotorscheibe gekippt ist','Er steigt senkrecht','Er landet','Er dreht sich im Kreis'],e:'Zyklische Blattverstellung kippt die Rotorscheibe.'},
+ {l:'ueberschall',s:2,p:.5,q:'Was zeigt die gelbe Linie?',a:['Den Machschen Kegel beim Überschallflug','Den Gleitweg','Die Startbahn','Einen Jetstream'],e:'Schneller als der Schall bilden die Druckwellen einen Kegel.'},
+ {l:'vereisung',s:2,p:.6,q:'Was passiert hier?',a:['Das Flugzeug wird enteist','Es wird betankt','Es wird gewaschen','Es wird lackiert'],e:'Heiße Enteisungsflüssigkeit entfernt Eis und Schnee.'},
+ {l:'segelflug',s:3,p:.6,q:'Warum kreist das Segelflugzeug hier?',a:['Es nutzt die Thermik zum Steigen','Es sucht die Landebahn','Es hat sich verflogen','Es wartet auf Freigabe'],e:'In der aufsteigenden warmen Luft gewinnt es Höhe.'}
+);
+
 
 /* ============ Player ============ */
 const P={L:null,t:0,playing:false,speed:1,cv:null,ctx:null,W:0,H:0,dirty:true,last:0,stepIdx:-1,tl:null};
